@@ -124,6 +124,37 @@ async function getAIResponse(prompt: string): Promise<Array<{
   };
 
   try {
+    const threadId = await createThread();
+    console.log(threadId,"threadId")
+    await openai.beta.threads.messages.create(threadId, {
+      role: "user",
+      content: prompt,
+    });
+
+    let run = await openai.beta.threads.runs.create(threadId, {
+      assistant_id: "asst_TSrJatFC3d1O8VX4rDdJVW7A",
+    });
+    console.log(run,"run")
+    let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
+
+    while (
+      runStatus.status === "queued" ||
+      runStatus.status === "in_progress" ||
+      runStatus.status === "cancelling" ||
+      runStatus.status === "requires_action"
+    ) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log(runStatus.status,"runStatus")
+      runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
+    }
+    if (runStatus.status === "completed") {
+      const messagesList = await openai.beta.threads.messages.list(
+        run.thread_id
+      );
+
+      const content: any = messagesList.data[0].content[0];
+      console.log(content, "content");
+    }
     const response = await openai.chat.completions.create({
       ...queryConfig,
       // return JSON if the model supports it:
@@ -143,6 +174,15 @@ async function getAIResponse(prompt: string): Promise<Array<{
   } catch (error) {
     console.error("Error:", error);
     return null;
+  }
+}
+
+async function createThread(): Promise<string> {
+  try {
+    const thread = await openai.beta.threads.create();
+    return thread.id;
+  } catch (error) {
+    throw error;
   }
 }
 
