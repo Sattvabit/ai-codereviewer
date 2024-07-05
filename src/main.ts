@@ -110,7 +110,10 @@ ${chunk.changes
 `;
 }
 
-async function getAIResponse(prompt: string) {
+async function getAIResponse(prompt: string): Promise<Array<{
+  lineNumber: string;
+  reviewComment: string;
+}> | null> {
   console.log("process start");
   const queryConfig = {
     model: OPENAI_API_MODEL,
@@ -168,10 +171,13 @@ async function getAIResponse(prompt: string) {
         },
       ],
     });
-    console.log(response.choices[0].message?.content,"response.choices[0].message?.content")
+    console.log(
+      response.choices[0].message?.content,
+      "response.choices[0].message?.content"
+    );
 
     const res = response.choices[0].message?.content?.trim() || "{}";
-    console.log(res,"res")
+    console.log(res, "res");
     return JSON.parse(res).reviews;
   } catch (error) {
     console.error("Error:", error);
