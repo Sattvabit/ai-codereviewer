@@ -124,36 +124,36 @@ async function getAIResponse(prompt: string) {
   try {
     const threadId = await createThread();
     console.log(threadId, "threadId");
-    await openai.beta.threads.messages.create(threadId, {
-      role: "user",
-      content: prompt,
-    });
-    console.log(assistantID, "assistantID");
-    let run = await openai.beta.threads.runs.create(threadId, {
-      assistant_id: assistantID,
-    });
-    console.log(run, "run");
-    let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
-    console.log(runStatus, "runStatus");
-    while (
-      runStatus.status === "queued" ||
-      runStatus.status === "in_progress" ||
-      runStatus.status === "cancelling" ||
-      runStatus.status === "requires_action"
-    ) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log(runStatus.status, "status");
-      runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
-    }
-    if (runStatus.status === "completed") {
-      const messagesList = await openai.beta.threads.messages.list(
-        run.thread_id
-      );
+    // await openai.beta.threads.messages.create(threadId, {
+    //   role: "user",
+    //   content: prompt,
+    // });
+    // console.log(assistantID, "assistantID");
+    // let run = await openai.beta.threads.runs.create(threadId, {
+    //   assistant_id: assistantID,
+    // });
+    // console.log(run, "run");
+    // let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
+    // console.log(runStatus, "runStatus");
+    // while (
+    //   runStatus.status === "queued" ||
+    //   runStatus.status === "in_progress" ||
+    //   runStatus.status === "cancelling" ||
+    //   runStatus.status === "requires_action"
+    // ) {
+    //   await new Promise((resolve) => setTimeout(resolve, 1000));
+    //   console.log(runStatus.status, "status");
+    //   runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
+    // }
+    // if (runStatus.status === "completed") {
+    //   const messagesList = await openai.beta.threads.messages.list(
+    //     run.thread_id
+    //   );
 
-      const content: any = messagesList.data[0].content[0];
-      console.log(content, "content");
-      // return content.text.value;
-    }
+    //   const content: any = messagesList.data[0].content[0];
+    //   console.log(content, "content");
+    //   // return content.text.value;
+    // }
 
     const response = await openai.chat.completions.create({
       ...queryConfig,
