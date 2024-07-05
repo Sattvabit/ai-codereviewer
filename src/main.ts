@@ -125,8 +125,8 @@ async function getAIResponse(prompt: string): Promise<Array<{
   };
   console.log("process start2");
   try {
-    const threadId = await createThread();
-    console.log(threadId, "threadId");
+    // const threadId = await createThread();
+    // console.log(threadId, "threadId");
     // await openai.beta.threads.messages.create(threadId, {
     //   role: "user",
     //   content: prompt,
