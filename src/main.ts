@@ -111,18 +111,9 @@ ${chunk.changes
 }
 
 async function getAIResponse(prompt: string) {
-  const queryConfig = {
-    model: OPENAI_API_MODEL,
-    temperature: 0.2,
-    max_tokens: 700,
-    top_p: 1,
-    frequency_penalty: 0,
-    presence_penalty: 0,
-  };
-
   try {
     const threadId = await createThread();
-    console.log(threadId,"threadId")
+
     await openai.beta.threads.messages.create(threadId, {
       role: "user",
       content: prompt,
@@ -131,7 +122,7 @@ async function getAIResponse(prompt: string) {
     let run = await openai.beta.threads.runs.create(threadId, {
       assistant_id: "asst_TSrJatFC3d1O8VX4rDdJVW7A",
     });
-    console.log(run,"run")
+
     let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
 
     while (
@@ -141,7 +132,7 @@ async function getAIResponse(prompt: string) {
       runStatus.status === "requires_action"
     ) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log(runStatus.status,"runStatus")
+
       runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
     }
     if (runStatus.status === "completed") {
@@ -150,25 +141,9 @@ async function getAIResponse(prompt: string) {
       );
 
       const content: any = messagesList.data[0].content[0];
-      console.log(content, "content");
-      return content.text.value
-    }
-    // const response = await openai.chat.completions.create({
-    //   ...queryConfig,
-    //   // return JSON if the model supports it:
-    //   ...(OPENAI_API_MODEL === "gpt-4-1106-preview"
-    //     ? { response_format: { type: "json_object" } }
-    //     : {}),
-    //   messages: [
-    //     {
-    //       role: "system",
-    //       content: prompt,
-    //     },
-    //   ],
-    // });
 
-    // const res = response.choices[0].message?.content?.trim() || "{}";
-    // return JSON.parse(res).reviews;
+      return null;
+    }
   } catch (error) {
     console.error("Error:", error);
     return null;
