@@ -152,8 +152,27 @@ async function getAIResponse(prompt: string) {
 
       const content: any = messagesList.data[0].content[0];
       console.log(content, "content");
-      return content.text.value;
+      // return content.text.value;
     }
+
+    const response = await openai.chat.completions.create({
+      ...queryConfig,
+      // return JSON if the model supports it:
+      ...(OPENAI_API_MODEL === "gpt-4-1106-preview"
+        ? { response_format: { type: "json_object" } }
+        : {}),
+      messages: [
+        {
+          role: "system",
+          content: prompt,
+        },
+      ],
+    });
+    console.log(response.choices[0].message?.content,"response.choices[0].message?.content")
+
+    const res = response.choices[0].message?.content?.trim() || "{}";
+    console.log(res,"res")
+    return JSON.parse(res).reviews;
   } catch (error) {
     console.error("Error:", error);
     return null;
