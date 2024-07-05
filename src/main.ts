@@ -141,8 +141,8 @@ async function getAIResponse(prompt: string) {
       );
 
       const content: any = messagesList.data[0].content[0];
-
-      return null;
+      console.log(content, "content");
+      return content.text.value;
     }
   } catch (error) {
     console.error("Error:", error);
