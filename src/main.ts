@@ -111,6 +111,7 @@ ${chunk.changes
 }
 
 async function getAIResponse(prompt: string) {
+  console.log("process start");
   const queryConfig = {
     model: OPENAI_API_MODEL,
     temperature: 0.2,
@@ -119,20 +120,21 @@ async function getAIResponse(prompt: string) {
     frequency_penalty: 0,
     presence_penalty: 0,
   };
-
+  console.log("process start2");
   try {
     const threadId = await createThread();
+    console.log(threadId, "threadId");
     await openai.beta.threads.messages.create(threadId, {
       role: "user",
       content: prompt,
     });
-
+    console.log(assistantID, "assistantID");
     let run = await openai.beta.threads.runs.create(threadId, {
       assistant_id: assistantID,
     });
-
+    console.log(run, "run");
     let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
-
+    console.log(runStatus, "runStatus");
     while (
       runStatus.status === "queued" ||
       runStatus.status === "in_progress" ||
@@ -140,7 +142,7 @@ async function getAIResponse(prompt: string) {
       runStatus.status === "requires_action"
     ) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
+      console.log(runStatus.status, "status");
       runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
     }
     if (runStatus.status === "completed") {
