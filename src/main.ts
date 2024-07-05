@@ -110,10 +110,7 @@ ${chunk.changes
 `;
 }
 
-async function getAIResponse(prompt: string): Promise<Array<{
-  lineNumber: string;
-  reviewComment: string;
-}> | null> {
+async function getAIResponse(prompt: string) {
   const queryConfig = {
     model: OPENAI_API_MODEL,
     temperature: 0.2,
@@ -154,23 +151,24 @@ async function getAIResponse(prompt: string): Promise<Array<{
 
       const content: any = messagesList.data[0].content[0];
       console.log(content, "content");
+      return content.text.value
     }
-    const response = await openai.chat.completions.create({
-      ...queryConfig,
-      // return JSON if the model supports it:
-      ...(OPENAI_API_MODEL === "gpt-4-1106-preview"
-        ? { response_format: { type: "json_object" } }
-        : {}),
-      messages: [
-        {
-          role: "system",
-          content: prompt,
-        },
-      ],
-    });
+    // const response = await openai.chat.completions.create({
+    //   ...queryConfig,
+    //   // return JSON if the model supports it:
+    //   ...(OPENAI_API_MODEL === "gpt-4-1106-preview"
+    //     ? { response_format: { type: "json_object" } }
+    //     : {}),
+    //   messages: [
+    //     {
+    //       role: "system",
+    //       content: prompt,
+    //     },
+    //   ],
+    // });
 
-    const res = response.choices[0].message?.content?.trim() || "{}";
-    return JSON.parse(res).reviews;
+    // const res = response.choices[0].message?.content?.trim() || "{}";
+    // return JSON.parse(res).reviews;
   } catch (error) {
     console.error("Error:", error);
     return null;
