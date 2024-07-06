@@ -137,7 +137,7 @@ ${chunk.changes
 `;
 }
 function getAIResponse(prompt) {
-    var _a, _b;
+    var _a, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
         const queryConfig = {
             model: OPENAI_API_MODEL,
@@ -169,6 +169,9 @@ function getAIResponse(prompt) {
                 if (runStatus.status === "completed") {
                     const messagesList = yield openai.beta.threads.messages.list(run.thread_id);
                     const content = messagesList.data[0].content[0];
+                    if (runStatus.usage) {
+                        console.log("Total tokens used:", runStatus.usage.total_tokens);
+                    }
                     return JSON.parse(content.text.value).reviews;
                 }
             }
@@ -183,6 +186,7 @@ function getAIResponse(prompt) {
                         },
                     ] }));
                 const res = ((_b = (_a = response.choices[0].message) === null || _a === void 0 ? void 0 : _a.content) === null || _b === void 0 ? void 0 : _b.trim()) || "{}";
+                console.log("Total tokens used:", (_c = response === null || response === void 0 ? void 0 : response.usage) === null || _c === void 0 ? void 0 : _c.total_tokens);
                 return JSON.parse(res).reviews;
             }
         }

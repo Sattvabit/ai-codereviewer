@@ -154,6 +154,10 @@ async function getAIResponse(prompt: string) {
 
         const content: any = messagesList.data[0].content[0];
 
+        if (runStatus.usage) {
+          console.log("Total tokens used:", runStatus.usage.total_tokens);
+        }
+
         return JSON.parse(content.text.value).reviews;
       }
     } else {
@@ -173,6 +177,7 @@ async function getAIResponse(prompt: string) {
       });
 
       const res = response.choices[0].message?.content?.trim() || "{}";
+      console.log("Total tokens used:", response?.usage?.total_tokens);
       return JSON.parse(res).reviews;
     }
   } catch (error) {
