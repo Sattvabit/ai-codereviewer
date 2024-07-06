@@ -121,7 +121,6 @@ async function getAIResponse(prompt: string) {
     presence_penalty: 0,
   };
   try {
-    console.log(ASSISTANT_ID, "assistant_id");
     if (ASSISTANT_ID) {
       console.log("assistant works");
       const threadId = await createThread();
@@ -153,7 +152,6 @@ async function getAIResponse(prompt: string) {
         );
 
         const content: any = messagesList.data[0].content[0];
-        console.log(content, "content");
 
         return JSON.parse(content.text.value).reviews;
       }

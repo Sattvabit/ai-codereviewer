@@ -147,7 +147,6 @@ function getAIResponse(prompt) {
             presence_penalty: 0,
         };
         try {
-            console.log(ASSISTANT_ID, "assistant_id");
             if (ASSISTANT_ID) {
                 console.log("assistant works");
                 const threadId = yield createThread();
@@ -169,7 +168,6 @@ function getAIResponse(prompt) {
                 if (runStatus.status === "completed") {
                     const messagesList = yield openai.beta.threads.messages.list(run.thread_id);
                     const content = messagesList.data[0].content[0];
-                    console.log(content, "content");
                     return JSON.parse(content.text.value).reviews;
                 }
             }
