@@ -8,6 +8,7 @@ import minimatch from "minimatch";
 const GITHUB_TOKEN: string = core.getInput("GITHUB_TOKEN");
 const OPENAI_API_KEY: string = core.getInput("OPENAI_API_KEY");
 const OPENAI_API_MODEL: string = core.getInput("OPENAI_API_MODEL");
+const ASSISTANT_ID: string = core.getInput("ASSISTANT_ID");
 
 const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
@@ -120,56 +121,60 @@ async function getAIResponse(prompt: string) {
     presence_penalty: 0,
   };
   try {
-    const threadId = await createThread();
+    if (ASSISTANT_ID) {
+      console.log("assistant works");
+      const threadId = await createThread();
 
-    await openai.beta.threads.messages.create(threadId, {
-      role: "user",
-      content: prompt,
-    });
+      await openai.beta.threads.messages.create(threadId, {
+        role: "user",
+        content: prompt,
+      });
 
-    let run = await openai.beta.threads.runs.create(threadId, {
-      assistant_id: "asst_TSrJatFC3d1O8VX4rDdJVW7A",
-    });
+      let run = await openai.beta.threads.runs.create(threadId, {
+        assistant_id: ASSISTANT_ID,
+      });
 
-    let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
+      let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
 
-    while (
-      runStatus.status === "queued" ||
-      runStatus.status === "in_progress" ||
-      runStatus.status === "cancelling" ||
-      runStatus.status === "requires_action"
-    ) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      while (
+        runStatus.status === "queued" ||
+        runStatus.status === "in_progress" ||
+        runStatus.status === "cancelling" ||
+        runStatus.status === "requires_action"
+      ) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
+        runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
+      }
+      if (runStatus.status === "completed") {
+        const messagesList = await openai.beta.threads.messages.list(
+          run.thread_id
+        );
+
+        const content: any = messagesList.data[0].content[0];
+        console.log(content, "content");
+
+        return JSON.parse(content.text.value).reviews;
+      }
+    } else {
+      console.log("completion api works");
+      const response = await openai.chat.completions.create({
+        ...queryConfig,
+        // return JSON if the model supports it:
+        ...(OPENAI_API_MODEL === "gpt-4o"
+          ? { response_format: { type: "json_object" } }
+          : {}),
+        messages: [
+          {
+            role: "system",
+            content: prompt,
+          },
+        ],
+      });
+
+      const res = response.choices[0].message?.content?.trim() || "{}";
+      return JSON.parse(res).reviews;
     }
-    if (runStatus.status === "completed") {
-      const messagesList = await openai.beta.threads.messages.list(
-        run.thread_id
-      );
-
-      const content: any = messagesList.data[0].content[0];
-      console.log(content, "content");
-
-      return JSON.parse(content.text.value).reviews;
-    }
-
-    // const response = await openai.chat.completions.create({
-    //   ...queryConfig,
-    //   // return JSON if the model supports it:
-    //   ...(OPENAI_API_MODEL === "gpt-4o"
-    //     ? { response_format: { type: "json_object" } }
-    //     : {}),
-    //   messages: [
-    //     {
-    //       role: "system",
-    //       content: prompt,
-    //     },
-    //   ],
-    // });
-
-    // const res = response.choices[0].message?.content?.trim() || "{}";
-    // return JSON.parse(res).reviews;
   } catch (error) {
     console.error("Error:", error);
     return null;
