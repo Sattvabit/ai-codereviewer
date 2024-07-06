@@ -165,7 +165,7 @@ function getAIResponse(prompt) {
                 const messagesList = yield openai.beta.threads.messages.list(run.thread_id);
                 const content = messagesList.data[0].content[0];
                 console.log(content, "content");
-                return content.text.value;
+                return JSON.parse(content.text.value).reviews;
             }
             // const response = await openai.chat.completions.create({
             //   ...queryConfig,
