@@ -147,6 +147,7 @@ function getAIResponse(prompt) {
             presence_penalty: 0,
         };
         try {
+            console.log(ASSISTANT_ID, "assistant_id");
             if (ASSISTANT_ID) {
                 console.log("assistant works");
                 const threadId = yield createThread();
