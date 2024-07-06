@@ -110,10 +110,7 @@ ${chunk.changes
 `;
 }
 
-async function getAIResponse(prompt: string): Promise<Array<{
-  lineNumber: string;
-  reviewComment: string;
-}> | null> {
+async function getAIResponse(prompt: string) {
   const queryConfig = {
     model: OPENAI_API_MODEL,
     temperature: 0.2,
@@ -123,25 +120,67 @@ async function getAIResponse(prompt: string): Promise<Array<{
     presence_penalty: 0,
   };
   try {
-    const response = await openai.chat.completions.create({
-      ...queryConfig,
-      // return JSON if the model supports it:
-      ...(OPENAI_API_MODEL === "gpt-4o"
-        ? { response_format: { type: "json_object" } }
-        : {}),
-      messages: [
-        {
-          role: "system",
-          content: prompt,
-        },
-      ],
+    const threadId = await createThread();
+
+    await openai.beta.threads.messages.create(threadId, {
+      role: "user",
+      content: prompt,
     });
 
-    const res = response.choices[0].message?.content?.trim() || "{}";
-    return JSON.parse(res).reviews;
+    let run = await openai.beta.threads.runs.create(threadId, {
+      assistant_id: "asst_TSrJatFC3d1O8VX4rDdJVW7A",
+    });
+
+    let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
+
+    while (
+      runStatus.status === "queued" ||
+      runStatus.status === "in_progress" ||
+      runStatus.status === "cancelling" ||
+      runStatus.status === "requires_action"
+    ) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
+    }
+    if (runStatus.status === "completed") {
+      const messagesList = await openai.beta.threads.messages.list(
+        run.thread_id
+      );
+
+      const content: any = messagesList.data[0].content[0];
+      console.log(content, "content");
+      return content.text.value;
+    }
+
+    // const response = await openai.chat.completions.create({
+    //   ...queryConfig,
+    //   // return JSON if the model supports it:
+    //   ...(OPENAI_API_MODEL === "gpt-4o"
+    //     ? { response_format: { type: "json_object" } }
+    //     : {}),
+    //   messages: [
+    //     {
+    //       role: "system",
+    //       content: prompt,
+    //     },
+    //   ],
+    // });
+
+    // const res = response.choices[0].message?.content?.trim() || "{}";
+    // return JSON.parse(res).reviews;
   } catch (error) {
     console.error("Error:", error);
     return null;
+  }
+}
+
+async function createThread(): Promise<string> {
+  try {
+    const thread = await openai.beta.threads.create();
+    return thread.id;
+  } catch (error) {
+    throw error;
   }
 }
 

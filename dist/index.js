@@ -135,7 +135,6 @@ ${chunk.changes
 `;
 }
 function getAIResponse(prompt) {
-    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         const queryConfig = {
             model: OPENAI_API_MODEL,
@@ -146,20 +145,58 @@ function getAIResponse(prompt) {
             presence_penalty: 0,
         };
         try {
-            const response = yield openai.chat.completions.create(Object.assign(Object.assign(Object.assign({}, queryConfig), (OPENAI_API_MODEL === "gpt-4o"
-                ? { response_format: { type: "json_object" } }
-                : {})), { messages: [
-                    {
-                        role: "system",
-                        content: prompt,
-                    },
-                ] }));
-            const res = ((_b = (_a = response.choices[0].message) === null || _a === void 0 ? void 0 : _a.content) === null || _b === void 0 ? void 0 : _b.trim()) || "{}";
-            return JSON.parse(res).reviews;
+            const threadId = yield createThread();
+            yield openai.beta.threads.messages.create(threadId, {
+                role: "user",
+                content: prompt,
+            });
+            let run = yield openai.beta.threads.runs.create(threadId, {
+                assistant_id: "asst_TSrJatFC3d1O8VX4rDdJVW7A",
+            });
+            let runStatus = yield openai.beta.threads.runs.retrieve(threadId, run.id);
+            while (runStatus.status === "queued" ||
+                runStatus.status === "in_progress" ||
+                runStatus.status === "cancelling" ||
+                runStatus.status === "requires_action") {
+                yield new Promise((resolve) => setTimeout(resolve, 1000));
+                runStatus = yield openai.beta.threads.runs.retrieve(threadId, run.id);
+            }
+            if (runStatus.status === "completed") {
+                const messagesList = yield openai.beta.threads.messages.list(run.thread_id);
+                const content = messagesList.data[0].content[0];
+                console.log(content, "content");
+                return content.text.value;
+            }
+            // const response = await openai.chat.completions.create({
+            //   ...queryConfig,
+            //   // return JSON if the model supports it:
+            //   ...(OPENAI_API_MODEL === "gpt-4o"
+            //     ? { response_format: { type: "json_object" } }
+            //     : {}),
+            //   messages: [
+            //     {
+            //       role: "system",
+            //       content: prompt,
+            //     },
+            //   ],
+            // });
+            // const res = response.choices[0].message?.content?.trim() || "{}";
+            // return JSON.parse(res).reviews;
         }
         catch (error) {
             console.error("Error:", error);
             return null;
+        }
+    });
+}
+function createThread() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const thread = yield openai.beta.threads.create();
+            return thread.id;
+        }
+        catch (error) {
+            throw error;
         }
     });
 }
