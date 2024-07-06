@@ -114,6 +114,7 @@ function createPrompt(file, chunk, prDetails) {
 - Write the comment in GitHub Markdown format.
 - Use the given description only for the overall context and only comment the code.
 - IMPORTANT: NEVER suggest adding comments to the code.
+- Please ensure that any console log errors are ignored when commenting on the pull request.
 
 Review the following code diff in the file "${file.to}" and take the pull request title and description into account when writing the response.
   
