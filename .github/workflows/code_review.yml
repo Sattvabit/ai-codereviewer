@@ -1,16 +1,10 @@
 name: Code Review with OpenAI
-
 on:
   pull_request:
     types:
       - opened
       - synchronize
-  workflow_dispatch: # This line allows manual triggering from the GitHub UI
-
-permissions: 
-  contents: write
-  pull-requests: write
-
+permissions: write-all
 jobs:
   code_review:
     runs-on: ubuntu-latest

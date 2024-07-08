@@ -95,7 +95,7 @@ function analyzeCode(parsedDiff, prDetails) {
             for (const chunk of file.chunks) {
                 const prompt = createPrompt(file, chunk, prDetails);
                 const aiResponse = yield getAIResponse(prompt);
-                if (aiResponse && Array.isArray(aiResponse)) {
+                if (aiResponse) {
                     const newComments = createComment(file, chunk, aiResponse);
                     if (newComments) {
                         comments.push(...newComments);
@@ -209,31 +209,13 @@ function createThread() {
 }
 function createComment(file, chunk, aiResponses) {
     return aiResponses.flatMap((aiResponse) => {
-        var _a, _b;
-        const lineNumber = Number(aiResponse.lineNumber);
-        const reviewComment = (_a = aiResponse.reviewComment) === null || _a === void 0 ? void 0 : _a.trim();
-        const filePath = (_b = file.to) === null || _b === void 0 ? void 0 : _b.trim();
-        if (!filePath || !reviewComment || isNaN(lineNumber) || lineNumber <= 0) {
-            console.log(`Skipping invalid comment:`, {
-                filePath,
-                reviewComment,
-                lineNumber,
-            });
-            return [];
-        }
-        const validLineNumber = chunk.changes.some((change) => change.ln === lineNumber || change.ln2 === lineNumber);
-        if (!validLineNumber) {
-            console.log(`Skipping comment due to invalid line number:`, {
-                filePath,
-                reviewComment,
-                lineNumber,
-            });
+        if (!file.to) {
             return [];
         }
         return {
-            body: reviewComment,
-            path: filePath,
-            line: lineNumber,
+            body: aiResponse.reviewComment,
+            path: file.to,
+            line: Number(aiResponse.lineNumber),
         };
     });
 }
