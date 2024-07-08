@@ -68,7 +68,7 @@ async function analyzeCode(
     for (const chunk of file.chunks) {
       const prompt = createPrompt(file, chunk, prDetails);
       const aiResponse = await getAIResponse(prompt);
-      if (aiResponse) {
+      if (aiResponse && Array.isArray(aiResponse)) {
         const newComments = createComment(file, chunk, aiResponse);
         if (newComments) {
           comments.push(...newComments);
@@ -210,6 +210,19 @@ function createComment(
 
     if (!filePath || !reviewComment || isNaN(lineNumber) || lineNumber <= 0) {
       console.log(`Skipping invalid comment:`, {
+        filePath,
+        reviewComment,
+        lineNumber,
+      });
+      return [];
+    }
+
+    const validLineNumber = chunk.changes.some(
+      (change: any) => change.ln === lineNumber || change.ln2 === lineNumber
+    );
+
+    if (!validLineNumber) {
+      console.log(`Skipping comment due to invalid line number:`, {
         filePath,
         reviewComment,
         lineNumber,
