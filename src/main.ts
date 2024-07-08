@@ -204,13 +204,23 @@ function createComment(
   }>
 ): Array<{ body: string; path: string; line: number }> {
   return aiResponses.flatMap((aiResponse) => {
-    if (!file.to) {
+    const lineNumber = Number(aiResponse.lineNumber);
+    const reviewComment = aiResponse.reviewComment?.trim();
+    const filePath = file.to?.trim();
+
+    if (!filePath || !reviewComment || isNaN(lineNumber) || lineNumber <= 0) {
+      console.log(`Skipping invalid comment:`, {
+        filePath,
+        reviewComment,
+        lineNumber,
+      });
       return [];
     }
+
     return {
-      body: aiResponse.reviewComment,
-      path: file.to,
-      line: Number(aiResponse.lineNumber),
+      body: reviewComment,
+      path: filePath,
+      line: lineNumber,
     };
   });
 }

@@ -209,13 +209,22 @@ function createThread() {
 }
 function createComment(file, chunk, aiResponses) {
     return aiResponses.flatMap((aiResponse) => {
-        if (!file.to) {
+        var _a, _b;
+        const lineNumber = Number(aiResponse.lineNumber);
+        const reviewComment = (_a = aiResponse.reviewComment) === null || _a === void 0 ? void 0 : _a.trim();
+        const filePath = (_b = file.to) === null || _b === void 0 ? void 0 : _b.trim();
+        if (!filePath || !reviewComment || isNaN(lineNumber) || lineNumber <= 0) {
+            console.log(`Skipping invalid comment:`, {
+                filePath,
+                reviewComment,
+                lineNumber,
+            });
             return [];
         }
         return {
-            body: aiResponse.reviewComment,
-            path: file.to,
-            line: Number(aiResponse.lineNumber),
+            body: reviewComment,
+            path: filePath,
+            line: lineNumber,
         };
     });
 }
