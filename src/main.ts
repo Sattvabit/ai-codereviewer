@@ -242,7 +242,7 @@ async function main() {
   console.log(eventData, "eventData");
   if (
     eventData.action === "opened" ||
-    eventData.action === "workflow_dispatch"
+    process.env.GITHUB_EVENT_NAME === "workflow_dispatch"
   ) {
     diff = await getDiff(
       prDetails.owner,
