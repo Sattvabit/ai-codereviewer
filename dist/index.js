@@ -52,6 +52,7 @@ const GITHUB_TOKEN = core.getInput("GITHUB_TOKEN");
 const OPENAI_API_KEY = core.getInput("OPENAI_API_KEY");
 const OPENAI_API_MODEL = core.getInput("OPENAI_API_MODEL");
 const ASSISTANT_ID = core.getInput("ASSISTANT_ID");
+const PULL_REQUEST_NUMBER = core.getInput("PULL_REQUEST_NUMBER"); // Get the PR number input
 const octokit = new rest_1.Octokit({ auth: GITHUB_TOKEN });
 const openai = new openai_1.default({
     apiKey: OPENAI_API_KEY,
@@ -24599,7 +24600,7 @@ const addFormValue = async (form, key, value) => {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VERSION = void 0;
-exports.VERSION = '4.52.3'; // x-release-please-version
+exports.VERSION = '4.52.4'; // x-release-please-version
 //# sourceMappingURL=version.js.map
 
 /***/ }),

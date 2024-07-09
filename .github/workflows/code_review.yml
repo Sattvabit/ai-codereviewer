@@ -1,7 +1,11 @@
 name: Code Review with OpenAI
 on:
   workflow_dispatch:
-    
+    inputs:
+      pull_request_number:
+        description: "Pull Request Number"
+        required: true
+
 permissions: write-all
 jobs:
   code_review:
@@ -17,3 +21,4 @@ jobs:
           ASSISTANT_ID: ${{ secrets.ASSISTANT_ID }}
           OPENAI_API_MODEL: "gpt-4o"
           exclude: "yarn.lock,dist/**"
+          PULL_REQUEST_NUMBER: ${{ github.event.inputs.pull_request_number }}

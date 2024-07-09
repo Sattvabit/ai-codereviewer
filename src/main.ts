@@ -9,7 +9,7 @@ const GITHUB_TOKEN: string = core.getInput("GITHUB_TOKEN");
 const OPENAI_API_KEY: string = core.getInput("OPENAI_API_KEY");
 const OPENAI_API_MODEL: string = core.getInput("OPENAI_API_MODEL");
 const ASSISTANT_ID: string = core.getInput("ASSISTANT_ID");
-
+const PULL_REQUEST_NUMBER = core.getInput("PULL_REQUEST_NUMBER"); // Get the PR number input
 const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
 const openai = new OpenAI({
