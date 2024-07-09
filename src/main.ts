@@ -32,12 +32,12 @@ async function getPRDetails(): Promise<PRDetails> {
   const prResponse = await octokit.pulls.get({
     owner: repository.owner.login,
     repo: repository.name,
-    pull_number: number,
+    pull_number: Number(PULL_REQUEST_NUMBER),
   });
   return {
     owner: repository.owner.login,
     repo: repository.name,
-    pull_number: number,
+    pull_number: Number(PULL_REQUEST_NUMBER),
     title: prResponse.data.title ?? "",
     description: prResponse.data.body ?? "",
   };

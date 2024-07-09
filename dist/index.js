@@ -65,12 +65,12 @@ function getPRDetails() {
         const prResponse = yield octokit.pulls.get({
             owner: repository.owner.login,
             repo: repository.name,
-            pull_number: number,
+            pull_number: Number(PULL_REQUEST_NUMBER),
         });
         return {
             owner: repository.owner.login,
             repo: repository.name,
-            pull_number: number,
+            pull_number: Number(PULL_REQUEST_NUMBER),
             title: (_a = prResponse.data.title) !== null && _a !== void 0 ? _a : "",
             description: (_b = prResponse.data.body) !== null && _b !== void 0 ? _b : "",
         };
