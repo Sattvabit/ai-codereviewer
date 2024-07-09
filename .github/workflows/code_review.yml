@@ -1,9 +1,7 @@
 name: Code Review with OpenAI
 on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
+  workflow_dispatch:
+    
 permissions: write-all
 jobs:
   code_review:
