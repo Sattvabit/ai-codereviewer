@@ -61,6 +61,7 @@ function getPRDetails() {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         const { repository, number } = JSON.parse((0, fs_1.readFileSync)(process.env.GITHUB_EVENT_PATH || "", "utf8"));
+        console.log(repository, number, "number");
         const prResponse = yield octokit.pulls.get({
             owner: repository.owner.login,
             repo: repository.name,
