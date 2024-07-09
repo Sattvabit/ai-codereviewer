@@ -61,7 +61,6 @@ function getPRDetails() {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         const { repository, number } = JSON.parse((0, fs_1.readFileSync)(process.env.GITHUB_EVENT_PATH || "", "utf8"));
-        console.log(repository, number, PULL_REQUEST_NUMBER, "number");
         const prResponse = yield octokit.pulls.get({
             owner: repository.owner.login,
             repo: repository.name,
@@ -238,7 +237,6 @@ function main() {
         const prDetails = yield getPRDetails();
         let diff;
         const eventData = JSON.parse((0, fs_1.readFileSync)((_a = process.env.GITHUB_EVENT_PATH) !== null && _a !== void 0 ? _a : "", "utf8"));
-        console.log(eventData, "eventData");
         if (eventData.action === "opened" ||
             process.env.GITHUB_EVENT_NAME === "workflow_dispatch") {
             diff = yield getDiff(prDetails.owner, prDetails.repo, prDetails.pull_number);
