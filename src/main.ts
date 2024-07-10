@@ -239,7 +239,7 @@ async function main() {
     readFileSync(process.env.GITHUB_EVENT_PATH ?? "", "utf8")
   );
 
-  console.log(process.env.GITHUB_EVENT_PATH, process.env.GITHUB_EVENT_PATH);
+  console.log(process.env.GITHUB_EVENT_PATH, eventData);
   if (
     eventData.action === "opened" ||
     process.env.GITHUB_EVENT_NAME === "workflow_dispatch"
