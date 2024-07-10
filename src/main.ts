@@ -9,7 +9,7 @@ const GITHUB_TOKEN: string = core.getInput("GITHUB_TOKEN");
 const OPENAI_API_KEY: string = core.getInput("OPENAI_API_KEY");
 const OPENAI_API_MODEL: string = core.getInput("OPENAI_API_MODEL");
 const ASSISTANT_ID: string = core.getInput("ASSISTANT_ID");
-const PULL_REQUEST_NUMBER = core.getInput("PULL_REQUEST_NUMBER"); // Get the PR number input
+const PULL_REQUEST_NUMBER = core.getInput("PULL_REQUEST_NUMBER");
 const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
 const openai = new OpenAI({
@@ -239,7 +239,6 @@ async function main() {
     readFileSync(process.env.GITHUB_EVENT_PATH ?? "", "utf8")
   );
 
-  console.log(process.env.GITHUB_EVENT_PATH, eventData);
   if (
     eventData.action === "opened" ||
     process.env.GITHUB_EVENT_NAME === "workflow_dispatch"
